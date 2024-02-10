@@ -6,10 +6,11 @@ which streams responses from Python workers through Redis.
 2. `websocat` for a terminal based websocket client
 
 ### Setup & start a python worker
-1. `cd workers/`
-2. Create & activate a venv
-3. `pip install -r requirements.txt`
-4. `python3 chatgpt_worker.py`
+1. Setup `OPENAI_API_KEY` environment variable.  If you don't have/want one, use slow_verbose_echo_worker.py instead of chatgpt_worker.py.
+2. `cd workers/`
+3. Create & activate a venv
+4. `pip install -r requirements.txt`
+5. `python3 chatgpt_worker.py`
 
 ### Setup & start the Rust API
 1. `cd api`
