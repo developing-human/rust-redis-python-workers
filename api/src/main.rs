@@ -4,12 +4,12 @@ use actix_web_actors::ws::{self};
 use redis::{self, AsyncCommands, Client};
 use uuid::Uuid;
 
-/// Define HTTP actor
-struct MyWs {
+struct WebSocketActor {
+    // Client is passed to the Actor because it can be cloned, unlike connection
     redis_client: web::Data<Client>
 }
 
-impl Actor for MyWs {
+impl Actor for WebSocketActor {
     type Context = ws::WebsocketContext<Self>;
 }
 
@@ -18,7 +18,7 @@ impl Actor for MyWs {
 #[rtype(result = "()")]
 struct TextMessage(String);
 
-impl Handler<TextMessage> for MyWs {
+impl Handler<TextMessage> for WebSocketActor {
     type Result = ();
 
     fn handle(&mut self, msg: TextMessage, ctx: &mut Self::Context) {
@@ -26,7 +26,7 @@ impl Handler<TextMessage> for MyWs {
     }
 }
 
-impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for MyWs {
+impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WebSocketActor {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         if let Ok(ws::Message::Text(text)) = msg {
             if text.len() == 1 {
@@ -77,7 +77,8 @@ async fn index(
     stream: web::Payload,
     redis_client: web::Data<redis::Client>,
 ) -> Result<HttpResponse, Error> {
-     ws::start(MyWs {redis_client}, &req, stream)
+    // Defer to WebSocketActor.handle() whenever a message comes in
+     ws::start(WebSocketActor {redis_client}, &req, stream)
 }
 
 #[actix_web::main]

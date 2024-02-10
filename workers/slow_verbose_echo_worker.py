@@ -16,6 +16,8 @@ while True:
         verbose_response = f"You sent a message of {message}"
         words = verbose_response.split(' ')
         
+        # send words back one at a time to show them "trickle in"
+        # through the redis queue
         for i, word in enumerate(words):
             padded_word = " " + word if i > 0 else word
             redis_con.rpush(response_queue, padded_word)
